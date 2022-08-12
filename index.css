@@ -8,6 +8,12 @@ body, html {
 body {
     background: url(./images/bg.jpg) no-repeat center center fixed;
     background-size: cover;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
 
 #vanta {
