@@ -3,5 +3,41 @@
   height: 100vh;
   overflow: hidden;
   position: relative;
-  background: #a8d8a8;
+  background: #fde8d8;
 }
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 100;
+}
+
+.nav-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--text);
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 32px;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--text-light);
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+}
+
+nav a:hover {
+  color: var(--text);
+}
+
