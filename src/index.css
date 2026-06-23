@@ -1,7 +1,7 @@
 :root {
   --coral: #ffa09a;
   --violet: #a78bda;
-  --yellow: #ffe08a;
+  --yellow: #e8c96e;
   --mint: #a0dba8;
   --bg: #fde8d8;
   --text: #5c4a3a;
@@ -18,5 +18,4 @@ body {
   font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
-  overflow: hidden;
 }
