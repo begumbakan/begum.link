@@ -2,8 +2,11 @@ import Character from './Character'
 import Bubbles from './Bubbles'
 import Projects from './Projects'
 import DropTransition from './DropTransition'
+import BlindBox from './BlindBox'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import './App.css'
+
+const POPMART_ZONE_INDEX = 2
 
 export default function App() {
   const [popping, setPopping] = useState(false)
@@ -13,8 +16,12 @@ export default function App() {
   const [transTargetPos, setTransTargetPos] = useState(null)
   const [charStartPos, setCharStartPos] = useState(null)
   const [projectZones, setProjectZones] = useState([])
+  const [showBlindBoxTeaser, setShowBlindBoxTeaser] = useState(false)
+  const [showBlindBoxModal, setShowBlindBoxModal] = useState(false)
+  const [collectedCats, setCollectedCats] = useState([])
   const bubbleRef = useRef(null)
   const charLandingPos = useRef(null)
+  const blindBoxOpenCount = useRef(0)
 
   useEffect(() => {
     document.body.style.overflow = transitioning ? 'hidden' : ''
@@ -54,6 +61,22 @@ export default function App() {
       cards[nextId].classList.remove('zone-returning')
       cards[nextId].classList.add('zone-active')
     }
+    setShowBlindBoxTeaser(nextId === POPMART_ZONE_INDEX)
+  }, [])
+
+  const handleBlindBoxOpen = useCallback(() => {
+    blindBoxOpenCount.current += 1
+    setShowBlindBoxModal(true)
+  }, [])
+
+  const handleBlindBoxClose = useCallback(() => {
+    setShowBlindBoxModal(false)
+  }, [])
+
+  const handleCatRevealed = useCallback((catName) => {
+    setCollectedCats((prev) =>
+      prev.includes(catName) ? prev : [...prev, catName]
+    )
   }, [])
 
   const handleTransitionDone = useCallback(() => {
@@ -97,7 +120,7 @@ export default function App() {
           onClick={handlePop}
         >
           <div className={`bubble-ring ${popping ? 'popping' : ''}`} />
-          <img src="/images/littlebegum1.png" alt="character" style={{ opacity: popping ? 0 : 1 }} />
+          <img src="/images/littlebegum/1.png" alt="character" style={{ opacity: popping ? 0 : 1 }} />
         </div>
       )}
       <Bubbles />
@@ -112,7 +135,36 @@ export default function App() {
     )}
 
     {!transitioning && charStartPos && (
-      <Character initialPos={charStartPos} zones={projectZones} onZoneChange={handleZoneChange} />
+      <Character
+        initialPos={charStartPos}
+        zones={projectZones}
+        onZoneChange={handleZoneChange}
+        showBlindBoxTeaser={showBlindBoxTeaser}
+        onBlindBoxOpen={handleBlindBoxOpen}
+        followers={collectedCats}
+      />
+    )}
+
+    {showBlindBoxTeaser && projectZones[POPMART_ZONE_INDEX] && (
+      <img
+        className="blindbox-teaser"
+        src="/images/blindbox/1.png"
+        alt="blind box"
+        onClick={handleBlindBoxOpen}
+        style={{
+          position: 'absolute',
+          left: projectZones[POPMART_ZONE_INDEX].cardRight - 64,
+          top: projectZones[POPMART_ZONE_INDEX].cardBottom - 64,
+        }}
+      />
+    )}
+
+    {showBlindBoxModal && (
+      <BlindBox
+        onCatRevealed={handleCatRevealed}
+        onClose={handleBlindBoxClose}
+        openCount={blindBoxOpenCount.current}
+      />
     )}
 
     <Projects />

@@ -18,7 +18,7 @@ export default function DropTransition({ startPos, targetPos, onDone }) {
 
   return (
     <img
-      src="/images/littlebegum1.png"
+      src="/images/littlebegum/1.png"
       alt="character"
       style={{
         position: 'fixed',

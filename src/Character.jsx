@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 
 const FRAMES = [
-  '/images/littlebegum1.png',
-  '/images/littlebegum2.png',
-  '/images/littlebegum3.png',
-  '/images/littlebegum4.png',
+  '/images/littlebegum/1.png',
+  '/images/littlebegum/2.png',
+  '/images/littlebegum/1.png',
+  '/images/littlebegum/3.png',
 ]
 const SPEED = 300
 const FRAME_INTERVAL = 150
+const HISTORY_LEN = 300
 
-export default function Character({ initialPos, autoTarget, zones, onZoneChange }) {
+export default function Character({ initialPos, autoTarget, zones, onZoneChange, showBlindBoxTeaser, onBlindBoxOpen, followers = [] }) {
   const [pos, setPos] = useState(initialPos ?? { x: 100, y: 300 })
   const [frame, setFrame] = useState(0)
   const [moving, setMoving] = useState(false)
@@ -21,6 +22,7 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange 
   const lastTimeRef = useRef(null)
   const posRef = useRef(initialPos ?? { x: 100, y: 300 })
   const activeZoneId = useRef(null)
+  const posHistoryRef = useRef([])
 
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -86,6 +88,12 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange 
         }
       }
 
+      const lastH = posHistoryRef.current[posHistoryRef.current.length - 1]
+      if (!lastH || lastH.x !== posRef.current.x || lastH.y !== posRef.current.y) {
+        posHistoryRef.current.push({ ...posRef.current })
+        if (posHistoryRef.current.length > HISTORY_LEN) posHistoryRef.current.shift()
+      }
+
       if (zones?.length) {
         const cx = posRef.current.x + 40
         const cy = posRef.current.y + 40
@@ -134,33 +142,51 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange 
   const tailOffset = Math.max(-70, Math.min(70, charCenterX - clampedLeft))
 
   return (
-    <div style={{ position: 'absolute', left: pos.x, top: pos.y, width: 80, zIndex: 90 }}>
-      {activeFact && (
-        <div
-          className="speech-bubble"
+    <>
+      {followers.map((cat, i) => {
+        const delay = (i + 1) * 12
+        const h = posHistoryRef.current
+        const histPos = h[Math.max(0, h.length - 1 - delay)] ?? pos
+        return (
+          <img
+            key={cat}
+            className="cat-follower"
+            src={`/images/cats/${cat}.png`}
+            alt={cat}
+            style={{ left: histPos.x + 20, top: histPos.y + 40 }}
+          />
+        )
+      })}
+
+      <div style={{ position: 'absolute', left: pos.x, top: pos.y, width: 80, zIndex: 90 }}>
+        {activeFact && (
+          <div
+            className="speech-bubble"
+            style={{
+              position: 'absolute',
+              bottom: 'calc(100% + 8px)',
+              left: clampedLeft - pos.x,
+              transform: 'translateX(-50%)',
+              zIndex: 91,
+              '--tail-x': `calc(50% + ${tailOffset}px)`,
+            }}
+          >
+            {activeFact}
+          </div>
+        )}
+
+        <img
+          src={FRAMES[frame]}
+          alt="character"
           style={{
-            position: 'absolute',
-            bottom: 'calc(100% + 8px)',
-            left: clampedLeft - pos.x,
-            transform: 'translateX(-50%)',
-            zIndex: 91,
-            '--tail-x': `calc(50% + ${tailOffset}px)`,
+            width: 80,
+            imageRendering: 'pixelated',
+            userSelect: 'none',
+            pointerEvents: 'none',
+            display: 'block',
           }}
-        >
-          {activeFact}
-        </div>
-      )}
-      <img
-        src={FRAMES[frame]}
-        alt="character"
-        style={{
-          width: 80,
-          imageRendering: 'pixelated',
-          userSelect: 'none',
-          pointerEvents: 'none',
-          display: 'block',
-        }}
-      />
-    </div>
+        />
+      </div>
+    </>
   )
 }
