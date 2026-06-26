@@ -1,7 +1,8 @@
 import Character from './Character'
 import Bubbles from './Bubbles'
+import Projects from './Projects'
 import DropTransition from './DropTransition'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import './App.css'
 
 export default function App() {
@@ -11,7 +12,14 @@ export default function App() {
   const [transStartPos, setTransStartPos] = useState(null)
   const [transTargetPos, setTransTargetPos] = useState(null)
   const [charStartPos, setCharStartPos] = useState(null)
+  const [projectZones, setProjectZones] = useState([])
   const bubbleRef = useRef(null)
+  const charLandingPos = useRef(null)
+
+  useEffect(() => {
+    document.body.style.overflow = transitioning ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [transitioning])
 
   const handlePop = () => {
     if (bubbleRef.current) {
@@ -22,6 +30,11 @@ export default function App() {
       const startX = rect.left + rect.width / 2 - 40
       const startY = rect.top + rect.height / 2 - 40
 
+      charLandingPos.current = {
+        x: startX,
+        y: heroBottom + window.scrollY + 50,
+      }
+
       setTransStartPos({ x: startX, y: startY })
       setTransTargetPos({ x: startX, y: heroBottom + 50 })
     }
@@ -30,13 +43,37 @@ export default function App() {
     setTimeout(() => setPopped(true), 400)
   }
 
-  const handleTransitionDone = useCallback((finalViewportPos) => {
-    const navHeight = document.querySelector('nav')?.offsetHeight ?? 0
-    const heroHeight = document.querySelector('.hero')?.offsetHeight ?? 0
-    setCharStartPos({
-      x: finalViewportPos.x,
-      y: finalViewportPos.y - navHeight - heroHeight,
+  const handleZoneChange = useCallback((prevId, nextId) => {
+    const cards = document.querySelectorAll('.project-card')
+    if (prevId !== null && cards[prevId]) {
+      cards[prevId].classList.remove('zone-active')
+      cards[prevId].classList.add('zone-returning')
+      setTimeout(() => cards[prevId].classList.remove('zone-returning'), 700)
+    }
+    if (nextId !== null && cards[nextId]) {
+      cards[nextId].classList.remove('zone-returning')
+      cards[nextId].classList.add('zone-active')
+    }
+  }, [])
+
+  const handleTransitionDone = useCallback(() => {
+    setCharStartPos(charLandingPos.current)
+    const cards = document.querySelectorAll('.project-card')
+    const zones = Array.from(cards).map((card, i) => {
+      const rect = card.getBoundingClientRect()
+      return {
+        id: i,
+        fact: card.dataset.fact ?? '',
+        platformX: rect.right - 79,
+        platformY: rect.top + window.scrollY - 5,
+        radius: 42,
+        cardLeft: rect.left,
+        cardRight: rect.right,
+        cardTop: rect.top + window.scrollY,
+        cardBottom: rect.bottom + window.scrollY,
+      }
     })
+    setProjectZones(zones)
     setTransitioning(false)
   }, [])
 
@@ -75,10 +112,10 @@ export default function App() {
     )}
 
     {!transitioning && charStartPos && (
-      <div className="world">
-        <Character initialPos={charStartPos} />
-      </div>
+      <Character initialPos={charStartPos} zones={projectZones} onZoneChange={handleZoneChange} />
     )}
+
+    <Projects />
   </>
   )
 }
