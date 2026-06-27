@@ -119,6 +119,21 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
         }
       }
 
+      
+      const isCurrentlyMoving =
+        (autoWalking && autoTarget) ||
+        keys.current['arrowright'] || keys.current['d'] ||
+        keys.current['arrowleft']  || keys.current['a'] ||
+        keys.current['arrowdown']  || keys.current['s'] ||
+        keys.current['arrowup']    || keys.current['w']
+
+      if (isCurrentlyMoving) {
+        const targetScroll = posRef.current.y - window.innerHeight * 0.5
+        const newScroll = Math.max(0, window.scrollY + (targetScroll - window.scrollY) * 0.08)
+        window.scrollTo(0, newScroll)
+}
+
+
       animRef.current = requestAnimationFrame(loop)
     }
     animRef.current = requestAnimationFrame(loop)
