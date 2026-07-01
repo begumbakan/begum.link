@@ -127,7 +127,7 @@ nav a:hover {
 }
 
 #projects {
-  padding: 80px 40px;
+  padding: 40px 40px 80px;
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -227,6 +227,117 @@ nav a:hover {
 .project-card.zone-returning::after {
   animation: card-bubble-appear 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+#about {
+  padding: 80px 40px 10px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+#about h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 40px;
+}
+
+.about-content {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 0 40px 40px;
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 48px;
+  align-items: center;
+}
+
+.about-photo-wrapper {
+  background: white;
+  padding: 12px 12px 48px 12px;
+  box-shadow: 4px 4px 16px rgba(92, 74, 58, 0.15);
+  transform: rotate(-2deg);
+  flex-shrink: 0;
+}
+
+.about-photo {
+  width: 200px;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.about-text {
+  position: relative;
+  background: #fffef9;
+  border-radius: 0 4px 4px 0;
+  padding: 20px 28px 28px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 31px,
+      #e8e0d8 31px,
+      #e8e0d8 32px
+    );
+  background-position: 0 10px;
+}
+
+.about-text::before {
+  content: '';
+  position: absolute;
+  left: 42px;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: rgba(220, 100, 100, 0.35);
+  pointer-events: none;
+}
+
+.about-text::after {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow:
+    0 55px 0 var(--bg),
+    0 110px 0 var(--bg),
+    0 165px 0 var(--bg),
+    0 220px 0 var(--bg),
+    0 275px 0 var(--bg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.about-text p {
+  font-family: 'Indie Flower', cursive;
+  font-size: 17px;
+  color: var(--text);
+  line-height: 32px;
+}
+
+.about-highlight {
+  background: linear-gradient(
+    104deg,
+    transparent 1%,
+    color-mix(in srgb, var(--coral) 38%, transparent) 3%,
+    color-mix(in srgb, var(--coral) 25%, transparent) 60%,
+    color-mix(in srgb, var(--coral) 38%, transparent) 94%,
+    transparent 97%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  border-radius: 3px 2px 4px 2px;
+  padding: 2px 5px;
+}
+
 
 .speech-bubble {
   background: white;

@@ -1,5 +1,6 @@
 import Character from './Character'
 import Bubbles from './Bubbles'
+import About from './About'
 import Projects from './Projects'
 import DropTransition from './DropTransition'
 import BlindBox from './BlindBox'
@@ -105,6 +106,7 @@ export default function App() {
     <nav>
       <span className="nav-logo">Begüm Bakan</span>
       <ul>
+        <li><a href="#about">About</a></li>
         <li><a href="#projects">Projects</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
@@ -167,6 +169,7 @@ export default function App() {
       />
     )}
 
+    <About />
     <Projects />
   </>
   )
