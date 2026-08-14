@@ -140,6 +140,14 @@ nav a:hover {
   margin-bottom: 40px;
 }
 
+.projects-hint {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: -32px;
+  margin-bottom: 32px;
+}
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -261,6 +269,19 @@ nav a:hover {
   flex-shrink: 0;
 }
 
+.about-photo-wrapper.wobbling {
+  animation: photo-wobble 0.7s ease-in-out forwards;
+}
+
+@keyframes photo-wobble {
+  0%   { transform: rotate(-2deg); }
+  20%  { transform: rotate(-8deg); }
+  45%  { transform: rotate(3deg); }
+  65%  { transform: rotate(-5deg); }
+  82%  { transform: rotate(1deg); }
+  100% { transform: rotate(-2deg); }
+}
+
 .about-photo {
   width: 200px;
   height: 220px;
@@ -339,40 +360,80 @@ nav a:hover {
 }
 
 
-.speech-bubble {
+.hero-speech-bubble {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
   background: white;
   border: 2px solid var(--text-light);
   border-radius: 4px;
-  padding: 10px 14px;
-  font-size: 13px;
+  padding: 8px 12px;
   font-family: 'Pixelify Sans', sans-serif;
+  font-size: 13px;
   color: var(--text);
-  max-width: 200px;
-  width: max-content;
-  text-align: center;
-  pointer-events: none;
-  line-height: 1.5;
+  white-space: nowrap;
   box-shadow: 3px 3px 0 var(--text-light);
+  pointer-events: none;
+  z-index: 3;
+  animation: hero-hint-in 0.3s ease-out, hero-hint-out 0.5s ease-in 3s forwards;
 }
 
-.speech-bubble::before {
+@keyframes hero-hint-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes hero-hint-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.hero-speech-bubble::after {
   content: '';
   position: absolute;
-  bottom: -11px;
-  left: var(--tail-x, 50%);
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: white;
+}
+
+.hero-speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-top-color: var(--text-light);
 }
 
-.speech-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: var(--tail-x, 50%);
+.movement-hint {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
   transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: white;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 16px;
+  color: var(--text-light);
+  background: white;
+  padding: 14px 24px;
+  border-radius: 20px;
+  box-shadow: 3px 3px 0 var(--text-light);
+  z-index: 150;
+  animation: hint-fadein 0.4s ease-out, hint-fadeout 0.6s ease-in 3.4s forwards;
+  pointer-events: none;
+}
+
+@keyframes hint-fadein {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes hint-fadeout {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
 .project-card:hover {
@@ -411,7 +472,7 @@ nav a:hover {
 
 .blindbox-teaser {
   position: absolute;
-  width: 48px;
+  width: 60px;
   image-rendering: pixelated;
   cursor: pointer;
   animation: blindbox-shake 0.4s ease-in-out infinite;
@@ -447,6 +508,7 @@ nav a:hover {
   box-shadow: 6px 6px 0 var(--text-light);
   max-width: 380px;
   width: 90%;
+  user-select: none;
 }
 
 .blindbox-frame {
@@ -523,6 +585,7 @@ nav a:hover {
   top: 0;
   height: 100%;
   background: color-mix(in srgb, var(--violet) 25%, transparent);
+  border-radius: 22px;
   pointer-events: none;
 }
 
@@ -571,6 +634,48 @@ nav a:hover {
   image-rendering: pixelated;
   pointer-events: none;
   z-index: 89;
+}
+
+.joystick-base {
+  display: none;
+  position: fixed;
+  bottom: 36px;
+  left: 36px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  border: 2px solid var(--text-light);
+  box-shadow: 3px 3px 0 var(--text-light);
+  z-index: 150;
+  touch-action: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.joystick-handle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--coral);
+  border: 2px solid white;
+  box-shadow: 2px 2px 0 rgba(92, 74, 58, 0.2);
+  pointer-events: none;
+  will-change: transform;
+}
+
+@media (pointer: coarse) {
+  .joystick-base {
+    display: flex;
+  }
+
+  .hero-speech-bubble {
+    display: none;
+  }
+
+  .movement-hint {
+    bottom: 160px;
+  }
 }
 
 .blindbox-reveal-actions {
@@ -662,6 +767,57 @@ nav a:hover {
   .bubble:nth-child(5),
   .bubble:nth-child(6) {
     display: none;
+  }
+
+  #about {
+    padding: 48px 20px 10px;
+  }
+
+  #about h2 {
+    font-size: 32px;
+    margin-bottom: 28px;
+  }
+
+  .about-content {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 32px;
+    padding: 0 0 32px;
+  }
+
+  .about-photo-wrapper {
+    transform: rotate(-1.5deg);
+  }
+
+  .about-photo {
+    width: 160px;
+    height: 176px;
+  }
+
+  .about-text {
+    width: 100%;
+    border-radius: 4px;
+    padding: 20px 20px 28px 48px;
+  }
+
+  .about-text::before {
+    left: 36px;
+  }
+
+  .about-text::after {
+    left: 10px;
+  }
+
+  .about-text p {
+    font-size: 15px;
+  }
+
+  #projects {
+    padding: 32px 20px 60px;
+  }
+
+  #projects h2 {
+    font-size: 32px;
   }
 }
 

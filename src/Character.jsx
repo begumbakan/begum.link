@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import SpeechBubble from './SpeechBubble'
 
 const FRAMES = [
   '/images/littlebegum/1.png',
@@ -9,6 +10,7 @@ const FRAMES = [
 const SPEED = 300
 const FRAME_INTERVAL = 150
 const HISTORY_LEN = 300
+const JOYSTICK_RADIUS = 44
 
 export default function Character({ initialPos, autoTarget, zones, onZoneChange, showBlindBoxTeaser, onBlindBoxOpen, followers = [] }) {
   const [pos, setPos] = useState(initialPos ?? { x: 100, y: 300 })
@@ -16,6 +18,7 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
   const [moving, setMoving] = useState(false)
   const [autoWalking, setAutoWalking] = useState(!!autoTarget)
   const [activeFact, setActiveFact] = useState(null)
+  const [joystickHandle, setJoystickHandle] = useState({ x: 0, y: 0 })
   const keys = useRef({})
   const animRef = useRef(null)
   const frameTimerRef = useRef(null)
@@ -23,6 +26,9 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
   const posRef = useRef(initialPos ?? { x: 100, y: 300 })
   const activeZoneId = useRef(null)
   const posHistoryRef = useRef([])
+  const joystickRef = useRef({ x: 0, y: 0 })
+  const joystickBaseRef = useRef(null)
+  const joystickTouchId = useRef(null)
 
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -39,6 +45,56 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
+    }
+  }, [])
+
+  const updateJoystick = useCallback((touch) => {
+    const el = joystickBaseRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    const rawDx = touch.clientX - cx
+    const rawDy = touch.clientY - cy
+    const dist = Math.sqrt(rawDx * rawDx + rawDy * rawDy)
+    if (dist === 0) {
+      joystickRef.current = { x: 0, y: 0 }
+      setJoystickHandle({ x: 0, y: 0 })
+      return
+    }
+    const scale = Math.min(dist, JOYSTICK_RADIUS) / dist
+    const clampedX = rawDx * scale
+    const clampedY = rawDy * scale
+    joystickRef.current = { x: clampedX / JOYSTICK_RADIUS, y: clampedY / JOYSTICK_RADIUS }
+    setJoystickHandle({ x: clampedX, y: clampedY })
+  }, [])
+
+  const handleJoystickStart = useCallback((e) => {
+    e.preventDefault()
+    const touch = e.changedTouches[0]
+    joystickTouchId.current = touch.identifier
+    setAutoWalking(false)
+    updateJoystick(touch)
+  }, [updateJoystick])
+
+  const handleJoystickMove = useCallback((e) => {
+    e.preventDefault()
+    for (const touch of e.changedTouches) {
+      if (touch.identifier === joystickTouchId.current) {
+        updateJoystick(touch)
+        break
+      }
+    }
+  }, [updateJoystick])
+
+  const handleJoystickEnd = useCallback((e) => {
+    for (const touch of e.changedTouches) {
+      if (touch.identifier === joystickTouchId.current) {
+        joystickRef.current = { x: 0, y: 0 }
+        joystickTouchId.current = null
+        setJoystickHandle({ x: 0, y: 0 })
+        break
+      }
     }
   }, [])
 
@@ -68,9 +124,16 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
         setMoving(true)
       } else {
         const k = keys.current
-        const dx = (k['arrowright'] || k['d'] ? 1 : 0) - (k['arrowleft'] || k['a'] ? 1 : 0)
-        const dy = (k['arrowdown']  || k['s'] ? 1 : 0) - (k['arrowup']   || k['w'] ? 1 : 0)
-        const isMoving = dx !== 0 || dy !== 0
+        const jx = joystickRef.current.x
+        const jy = joystickRef.current.y
+        const kx = (k['arrowright'] || k['d'] ? 1 : 0) - (k['arrowleft'] || k['a'] ? 1 : 0)
+        const ky = (k['arrowdown']  || k['s'] ? 1 : 0) - (k['arrowup']   || k['w'] ? 1 : 0)
+        const combinedX = kx + jx
+        const combinedY = ky + jy
+        const len = Math.sqrt(combinedX * combinedX + combinedY * combinedY)
+        const dx = len > 1 ? combinedX / len : combinedX
+        const dy = len > 1 ? combinedY / len : combinedY
+        const isMoving = len > 0.05
         setMoving(isMoving)
 
         if (isMoving) {
@@ -119,20 +182,21 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
         }
       }
 
-      
+      const jx = joystickRef.current.x
+      const jy = joystickRef.current.y
       const isCurrentlyMoving =
         (autoWalking && autoTarget) ||
         keys.current['arrowright'] || keys.current['d'] ||
         keys.current['arrowleft']  || keys.current['a'] ||
         keys.current['arrowdown']  || keys.current['s'] ||
-        keys.current['arrowup']    || keys.current['w']
+        keys.current['arrowup']    || keys.current['w'] ||
+        Math.abs(jx) > 0.05 || Math.abs(jy) > 0.05
 
       if (isCurrentlyMoving) {
         const targetScroll = posRef.current.y - window.innerHeight * 0.5
         const newScroll = Math.max(0, window.scrollY + (targetScroll - window.scrollY) * 0.08)
         window.scrollTo(0, newScroll)
-}
-
+      }
 
       animRef.current = requestAnimationFrame(loop)
     }
@@ -175,8 +239,7 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
 
       <div style={{ position: 'absolute', left: pos.x, top: pos.y, width: 80, zIndex: 90 }}>
         {activeFact && (
-          <div
-            className="speech-bubble"
+          <SpeechBubble
             style={{
               position: 'absolute',
               bottom: 'calc(100% + 8px)',
@@ -187,7 +250,7 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
             }}
           >
             {activeFact}
-          </div>
+          </SpeechBubble>
         )}
 
         <img
@@ -200,6 +263,20 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
             pointerEvents: 'none',
             display: 'block',
           }}
+        />
+      </div>
+
+      <div
+        className="joystick-base"
+        ref={joystickBaseRef}
+        onTouchStart={handleJoystickStart}
+        onTouchMove={handleJoystickMove}
+        onTouchEnd={handleJoystickEnd}
+        onTouchCancel={handleJoystickEnd}
+      >
+        <div
+          className="joystick-handle"
+          style={{ transform: `translate(${joystickHandle.x}px, ${joystickHandle.y}px)` }}
         />
       </div>
     </>

@@ -1,9 +1,10 @@
 import projects from "./projectsData";
 
-export default function Projects() {
+export default function Projects({ hint }) {
     return (
         <section id="projects">
             <h2>Projects</h2>
+            {hint && <p className="projects-hint">Walk near a card to pop its bubble ✦</p>}
             <div className="projects-grid">
                 {projects.map((p) => (
                     <a 

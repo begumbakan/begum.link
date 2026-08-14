@@ -1,0 +1,36 @@
+.speech-bubble {
+  background: white;
+  border: 2px solid var(--text-light);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: 'Pixelify Sans', sans-serif;
+  color: var(--text);
+  max-width: 200px;
+  width: max-content;
+  text-align: center;
+  pointer-events: none;
+  line-height: 1.5;
+  box-shadow: 3px 3px 0 var(--text-light);
+  position: relative;
+}
+
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: var(--tail-x, 50%);
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--text-light);
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: var(--tail-x, 50%);
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: white;
+}

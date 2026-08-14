@@ -4,10 +4,12 @@ import About from './About'
 import Projects from './Projects'
 import DropTransition from './DropTransition'
 import BlindBox from './BlindBox'
+import SpeechBubble from './SpeechBubble'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import './App.css'
 
-const POPMART_ZONE_INDEX = 2
+const BLINDBOX_ZONE_INDEX = 2
+const PHOTO_ZONE_ID = 100
 
 export default function App() {
   const [popping, setPopping] = useState(false)
@@ -20,6 +22,8 @@ export default function App() {
   const [showBlindBoxTeaser, setShowBlindBoxTeaser] = useState(false)
   const [showBlindBoxModal, setShowBlindBoxModal] = useState(false)
   const [collectedCats, setCollectedCats] = useState([])
+  const [showMovementHint, setShowMovementHint] = useState(false)
+  const [showHeroHint, setShowHeroHint] = useState(true)
   const bubbleRef = useRef(null)
   const charLandingPos = useRef(null)
   const blindBoxOpenCount = useRef(0)
@@ -28,6 +32,11 @@ export default function App() {
     document.body.style.overflow = transitioning ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [transitioning])
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowHeroHint(false), 3500)
+    return () => clearTimeout(t)
+  }, [])
 
   const handlePop = () => {
     if (bubbleRef.current) {
@@ -53,16 +62,23 @@ export default function App() {
 
   const handleZoneChange = useCallback((prevId, nextId) => {
     const cards = document.querySelectorAll('.project-card')
-    if (prevId !== null && cards[prevId]) {
+    if (prevId !== null && prevId !== PHOTO_ZONE_ID && cards[prevId]) {
       cards[prevId].classList.remove('zone-active')
       cards[prevId].classList.add('zone-returning')
       setTimeout(() => cards[prevId].classList.remove('zone-returning'), 700)
     }
-    if (nextId !== null && cards[nextId]) {
+    if (nextId !== null && nextId !== PHOTO_ZONE_ID && cards[nextId]) {
       cards[nextId].classList.remove('zone-returning')
       cards[nextId].classList.add('zone-active')
     }
-    setShowBlindBoxTeaser(nextId === POPMART_ZONE_INDEX)
+    setShowBlindBoxTeaser(nextId === BLINDBOX_ZONE_INDEX)
+
+    const photoWrapper = document.querySelector('.about-photo-wrapper')
+    if (nextId === PHOTO_ZONE_ID) {
+      photoWrapper?.classList.add('wobbling')
+    } else {
+      photoWrapper?.classList.remove('wobbling')
+    }
   }, [])
 
   const handleBlindBoxOpen = useCallback(() => {
@@ -97,8 +113,27 @@ export default function App() {
         cardBottom: rect.bottom + window.scrollY,
       }
     })
+
+    const photoEl = document.querySelector('.about-photo-wrapper')
+    if (photoEl) {
+      const r = photoEl.getBoundingClientRect()
+      zones.push({
+        id: PHOTO_ZONE_ID,
+        fact: "That's me!",
+        platformX: r.left + r.width / 2 - 40,
+        platformY: r.top + window.scrollY + r.height / 2 - 40,
+        radius: 120,
+        cardLeft: 0,
+        cardRight: window.innerWidth,
+        cardTop: r.top + window.scrollY - 60,
+        cardBottom: r.bottom + window.scrollY + 60,
+      })
+    }
+
     setProjectZones(zones)
     setTransitioning(false)
+    setShowMovementHint(true)
+    setTimeout(() => setShowMovementHint(false), 4000)
   }, [])
 
   return (
@@ -123,6 +158,11 @@ export default function App() {
         >
           <div className={`bubble-ring ${popping ? 'popping' : ''}`} />
           <img src="/images/littlebegum/1.png" alt="character" style={{ opacity: popping ? 0 : 1 }} />
+          {!popping && showHeroHint && (
+            <SpeechBubble className="hero-speech-bubble">
+              Click on the bubble!
+            </SpeechBubble>
+          )}
         </div>
       )}
       <Bubbles />
@@ -147,18 +187,23 @@ export default function App() {
       />
     )}
 
-    {showBlindBoxTeaser && projectZones[POPMART_ZONE_INDEX] && (
-      <img
-        className="blindbox-teaser"
-        src="/images/blindbox/1.png"
-        alt="blind box"
-        onClick={handleBlindBoxOpen}
-        style={{
-          position: 'absolute',
-          left: projectZones[POPMART_ZONE_INDEX].cardRight - 64,
-          top: projectZones[POPMART_ZONE_INDEX].cardBottom - 64,
-        }}
-      />
+    {showBlindBoxTeaser && projectZones[BLINDBOX_ZONE_INDEX] && (
+      <>
+        <img
+          className="blindbox-teaser"
+          src="/images/blindbox/1.png"
+          alt="blind box"
+          onClick={handleBlindBoxOpen}
+          style={{
+            position: 'absolute',
+            left: projectZones[BLINDBOX_ZONE_INDEX].cardRight - 64,
+            top: projectZones[BLINDBOX_ZONE_INDEX].cardBottom - 64,
+          }}
+        />
+        {!showBlindBoxModal && blindBoxOpenCount.current === 0 && (
+          <div className="movement-hint">Click on the blind box to open it!</div>
+        )}
+      </>
     )}
 
     {showBlindBoxModal && (
@@ -169,8 +214,16 @@ export default function App() {
       />
     )}
 
+    {showMovementHint && (
+      <div className="movement-hint">
+        {window.matchMedia('(pointer: coarse)').matches
+          ? 'Use the joystick to walk!'
+          : 'Use arrow keys or WASD to walk around!'}
+      </div>
+    )}
+
     <About />
-    <Projects />
+    <Projects hint={!!charStartPos} />
   </>
   )
 }

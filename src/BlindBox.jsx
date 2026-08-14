@@ -27,22 +27,41 @@ export default function BlindBox({ onCatRevealed, onClose, openCount = 1 }) {
   const [revealed, setRevealed] = useState(false)
   const [revealedCat, setRevealedCat] = useState(null)
   const catRef = useRef(null)
+  const trackRef = useRef(null)
 
   const frameIndex = Math.min(FRAMES - 1, Math.floor((sliderVal / 100) * FRAMES))
 
-  const handleSlider = (e) => {
-    const val = Number(e.target.value)
+  const updateFromPointer = (e) => {
+    if (!trackRef.current) return
+    const rect = trackRef.current.getBoundingClientRect()
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width))
+    const val = Math.round((x / rect.width) * 100)
     setSliderVal(val)
-    if (val === 100 && !revealed) {
+    if (val === 100 && !catRef.current) {
       const cat = pickCat()
       catRef.current = cat
       setRevealedCat(cat)
       setRevealed(true)
-    }
-    if (val < 100 && revealed) {
+    } else if (val < 100 && catRef.current) {
+      catRef.current = null
       setRevealed(false)
       setRevealedCat(null)
     }
+  }
+
+  const handlePointerDown = (e) => {
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    updateFromPointer(e)
+  }
+
+  const handlePointerMove = (e) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return
+    updateFromPointer(e)
+  }
+
+  const handlePointerUp = (e) => {
+    e.currentTarget.releasePointerCapture(e.pointerId)
   }
 
   const handleKeep = () => {
@@ -86,16 +105,17 @@ export default function BlindBox({ onCatRevealed, onClose, openCount = 1 }) {
         {!revealed && (
           <div className="blindbox-slider-area">
             <p className="blindbox-hint">slide to open →</p>
-            <div className="blindbox-slider-track">
-              <div className="blindbox-slider-fill" style={{ width: `${sliderVal}%` }} />
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={sliderVal}
-                onChange={handleSlider}
-                className="blindbox-slider-input"
-              />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <div
+                className="blindbox-slider-track"
+                ref={trackRef}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                style={{ touchAction: 'none', cursor: 'pointer' }}
+              >
+                <div className="blindbox-slider-fill" style={{ width: `${sliderVal}%` }} />
+              </div>
             </div>
           </div>
         )}
