@@ -99,6 +99,21 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
   }, [])
 
   useEffect(() => {
+    const el = joystickBaseRef.current
+    if (!el) return
+    el.addEventListener('touchstart', handleJoystickStart, { passive: false })
+    el.addEventListener('touchmove', handleJoystickMove, { passive: false })
+    el.addEventListener('touchend', handleJoystickEnd)
+    el.addEventListener('touchcancel', handleJoystickEnd)
+    return () => {
+      el.removeEventListener('touchstart', handleJoystickStart)
+      el.removeEventListener('touchmove', handleJoystickMove)
+      el.removeEventListener('touchend', handleJoystickEnd)
+      el.removeEventListener('touchcancel', handleJoystickEnd)
+    }
+  }, [handleJoystickStart, handleJoystickMove, handleJoystickEnd])
+
+  useEffect(() => {
     const loop = (timestamp) => {
       const delta = lastTimeRef.current ? (timestamp - lastTimeRef.current) / 1000 : 0
       lastTimeRef.current = timestamp
@@ -269,10 +284,6 @@ export default function Character({ initialPos, autoTarget, zones, onZoneChange,
       <div
         className="joystick-base"
         ref={joystickBaseRef}
-        onTouchStart={handleJoystickStart}
-        onTouchMove={handleJoystickMove}
-        onTouchEnd={handleJoystickEnd}
-        onTouchCancel={handleJoystickEnd}
       >
         <div
           className="joystick-handle"

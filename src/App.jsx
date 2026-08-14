@@ -2,6 +2,7 @@ import Character from './Character'
 import Bubbles from './Bubbles'
 import About from './About'
 import Projects from './Projects'
+import Contact from './Contact'
 import DropTransition from './DropTransition'
 import BlindBox from './BlindBox'
 import SpeechBubble from './SpeechBubble'
@@ -224,6 +225,7 @@ export default function App() {
 
     <About />
     <Projects hint={!!charStartPos} />
+    <Contact />
   </>
   )
 }

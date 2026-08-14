@@ -116,6 +116,7 @@ nav a:hover {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  z-index: 4;
   animation: float 5s ease-in-out 0.5s infinite;
 }
 
@@ -744,6 +745,95 @@ nav a:hover {
   animation: pop 0.4s ease-out forwards !important;
 }
 
+#contact {
+  padding: 40px 40px 100px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+#contact h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.contact-intro {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: var(--text-light);
+  line-height: 1.6;
+  max-width: 480px;
+  margin-bottom: 32px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  max-width: 600px;
+}
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 16px;
+  background: white;
+  text-decoration: none;
+  color: var(--text);
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.contact-card:hover {
+  border-color: var(--text-light);
+  transform: translateY(-4px);
+}
+
+.contact-card-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.contact-card-icon-coral {
+  background: var(--coral);
+}
+
+.contact-card-icon-violet {
+  background: var(--violet);
+}
+
+.contact-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.contact-card-label {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.contact-card-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   nav {
     padding: 16px 20px;
@@ -754,13 +844,23 @@ nav a:hover {
   }
 
   .hero {
-    height: 500px;
+    height: 400px;
+    padding: 48px 24px 32px;
+  }
+
+  .hero h1 {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+
+  .hero p {
+    font-size: 16px;
   }
 
   .character-bubble {
     right: 10%;
     top: auto;
-    bottom: 20px;
+    bottom: 16px;
   }
 
   .bubble:nth-child(4),
@@ -818,6 +918,18 @@ nav a:hover {
 
   #projects h2 {
     font-size: 32px;
+  }
+
+  #contact {
+    padding: 32px 20px 60px;
+  }
+
+  #contact h2 {
+    font-size: 32px;
+  }
+
+  .contact-card {
+    padding: 20px;
   }
 }
 
