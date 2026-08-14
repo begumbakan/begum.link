@@ -1,0 +1,22 @@
+:root {
+  --coral: #ffa09a;
+  --violet: #a78bda;
+  --yellow: #e8c96e;
+  --mint: #a0dba8;
+  --bg: #fde8d8;
+  --text: #5c4a3a;
+  --text-light: #9c7e6a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  position: relative;
+}
