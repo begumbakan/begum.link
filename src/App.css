@@ -585,7 +585,7 @@ nav a:hover {
   left: 0;
   top: 0;
   height: 100%;
-  background: color-mix(in srgb, var(--violet) 25%, transparent);
+  background: color-mix(in srgb, var(--pink-dark) 25%, transparent);
   border-radius: 22px;
   pointer-events: none;
 }
@@ -766,9 +766,9 @@ nav a:hover {
 
 .contact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  max-width: 600px;
+  max-width: 760px;
 }
 
 .contact-card {
