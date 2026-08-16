@@ -861,6 +861,8 @@ nav a:hover {
     right: 10%;
     top: auto;
     bottom: 16px;
+    width: 150px;
+    height: 150px;
   }
 
   .bubble:nth-child(4),
