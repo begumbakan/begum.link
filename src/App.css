@@ -670,10 +670,6 @@ nav a:hover {
     display: flex;
   }
 
-  .hero-speech-bubble {
-    display: none;
-  }
-
   .movement-hint {
     bottom: 160px;
   }
@@ -810,6 +806,10 @@ nav a:hover {
 
 .contact-card-icon-violet {
   background: var(--violet);
+}
+
+.contact-card-icon-dark {
+  background: var(--text);
 }
 
 .contact-card-text {
